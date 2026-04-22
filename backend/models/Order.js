@@ -7,6 +7,8 @@ const orderSchema = new mongoose.Schema({
   buyer:   { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   seller:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   price:   { type: Number, required: true },
+  deliveryAddress: { type: String },
+  paymentMethod:   { type: String, enum: ['Cash', 'UPI'], required: true },
   note:    { type: String, default: '' },
   status:  {
     type: String,

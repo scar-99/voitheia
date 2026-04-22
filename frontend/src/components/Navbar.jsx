@@ -10,7 +10,8 @@ export default function Navbar() {
 
   return (
     <nav style={{
-      background: '#fff',
+      background: 'rgba(15, 23, 42, 0.8)',
+      backdropFilter: 'blur(12px)',
       borderBottom: '1px solid var(--border)',
       position: 'sticky', top: 0, zIndex: 100
     }}>
@@ -28,7 +29,7 @@ export default function Navbar() {
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
           <NavLink to="/marketplace" icon={<ShoppingBag size={16}/>} label="Marketplace" />
           <NavLink to="/gigs"        icon={<Briefcase size={16}/>}    label="Freelancing" />
-          {user && <NavLink to="/dashboard"  icon={<MessageSquare size={16}/>} label="Messages" />}
+          {user && <NavLink to="/chat"  icon={<MessageSquare size={16}/>} label="Messages" />}
         </div>
 
         {/* Right side */}

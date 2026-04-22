@@ -1,12 +1,15 @@
+// Load environment variables FIRST, before any other imports
+import dotenv from 'dotenv';
+dotenv.config();
+
+// Now import everything else
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 import connectDB from './config/db.js';
+import { configureCloudinary } from './config/cloudinary.js';
 import { initSocket } from './socket/socketHandler.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
@@ -15,6 +18,9 @@ import productRoutes from './routes/products.js';
 import gigRoutes     from './routes/gigs.js';
 import orderRoutes   from './routes/orders.js';
 import messageRoutes from './routes/messages.js';
+
+// Configure Cloudinary after dotenv is loaded
+configureCloudinary();
 
 connectDB();
 

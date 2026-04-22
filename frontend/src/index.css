@@ -1,24 +1,27 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --primary:    #7F77DD;
-  --primary-dk: #534AB7;
-  --surface:    #f8f8fc;
-  --card:       #ffffff;
-  --border:     #e8e8f0;
-  --text:       #1a1a2e;
-  --muted:      #6b6b8a;
-  --danger:     #e24b4a;
-  --success:    #1D9E75;
-  --radius:     10px;
-  --shadow:     0 1px 4px rgba(0,0,0,0.08);
+  --primary:    #00f0ff;
+  --primary-dk: #00d0dd;
+  --primary-glow: rgba(0, 240, 255, 0.4);
+  --surface:    #0f172a;
+  --card:       rgba(30, 41, 59, 0.7);
+  --border:     rgba(255, 255, 255, 0.1);
+  --text:       #f8fafc;
+  --muted:      #94a3b8;
+  --danger:     #ef4444;
+  --success:    #10b981;
+  --radius:     12px;
+  --shadow:     0 4px 20px rgba(0,0,0,0.3);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--surface);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  background-attachment: fixed;
   color: var(--text);
   line-height: 1.6;
+  min-height: 100vh;
 }
 
 a { color: inherit; text-decoration: none; }
@@ -30,13 +33,16 @@ input, textarea, select {
   border-radius: var(--radius);
   font-size: 14px;
   font-family: inherit;
-  background: #fff;
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--text);
   outline: none;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
 }
 
 input:focus, textarea:focus, select:focus {
   border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
 
 button {
@@ -55,16 +61,23 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: #0f172a;
+  box-shadow: 0 0 15px var(--primary-glow);
 }
-.btn-primary:hover { background: var(--primary-dk); }
+.btn-primary:hover { 
+  background: var(--primary-dk); 
+  box-shadow: 0 0 25px var(--primary-glow);
+}
 
 .btn-outline {
   background: transparent;
   border: 1px solid var(--border);
   color: var(--text);
 }
-.btn-outline:hover { background: var(--surface); }
+.btn-outline:hover { 
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary); 
+}
 
 .btn-danger {
   background: var(--danger);
@@ -77,6 +90,15 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: var(--radius);
   padding: 1.25rem;
   box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.card.hoverable:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--primary);
+  box-shadow: 0 12px 30px var(--primary-glow);
 }
 
 .badge {
@@ -87,11 +109,25 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   font-weight: 500;
 }
 
-.badge-purple { background: #EEEDFE; color: #534AB7; }
-.badge-green  { background: #EAF3DE; color: #3B6D11; }
-.badge-amber  { background: #FAEEDA; color: #854F0B; }
-.badge-red    { background: #FCEBEB; color: #A32D2D; }
-.badge-gray   { background: #F1EFE8; color: #5F5E5A; }
+.badge-purple { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border: 1px solid rgba(139, 92, 246, 0.3); }
+.badge-green  { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-amber  { background: rgba(245, 158, 11, 0.2); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-red    { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-gray   { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+/* Animations */
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-scale { animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.slide-up { animation: slideUp 0.5s ease-out forwards; }
 
 .page { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem; }
 .page-sm { max-width: 480px;  margin: 0 auto; padding: 2rem 1.25rem; }

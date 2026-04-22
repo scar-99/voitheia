@@ -17,7 +17,7 @@ export const register = async (req, res) => {
     const user = await User.create({ name, email, password, college });
     res.status(201).json({
       token: generateToken(user._id),
-      user: { _id: user._id, name: user.name, email: user.email, college: user.college }
+      user: { _id: user._id, name: user.name, email: user.email, college: user.college, phone: user.phone, upiId: user.upiId, addresses: user.addresses }
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -35,7 +35,11 @@ export const login = async (req, res) => {
 
   res.json({
     token: generateToken(user._id),
-    user: { _id: user._id, name: user.name, email: user.email, college: user.college, avatar: user.avatar, rating: user.rating, reviewCount: user.reviewCount }
+    user: { 
+      _id: user._id, name: user.name, email: user.email, college: user.college, 
+      avatar: user.avatar, rating: user.rating, reviewCount: user.reviewCount,
+      phone: user.phone, upiId: user.upiId, addresses: user.addresses
+    }
   });
 };
 
@@ -49,10 +53,10 @@ export const getMe = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, bio, college, avatar } = req.body;
+    const { name, bio, college, avatar, phone, upiId, addresses } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user._id,
-      { name, bio, college, avatar },
+      { name, bio, college, avatar, phone, upiId, addresses },
       { new: true, runValidators: true }
     ).select('-password');
     res.json(user);

@@ -5,6 +5,7 @@ const gigSchema = new mongoose.Schema({
   title:        { type: String, required: true, trim: true },
   description:  { type: String, default: '' },
   price:        { type: Number, required: true, min: 0 },
+  isNegotiable: { type: Boolean, default: false },
   deliveryDays: { type: Number, required: true, min: 1 },
   category:     {
     type: String,

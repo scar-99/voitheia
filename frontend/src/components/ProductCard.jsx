@@ -5,11 +5,9 @@ export default function ProductCard({ product }) {
   const img = product.images?.[0];
   return (
     <Link to={`/marketplace/${product._id}`}>
-      <div className="card" style={{ padding: 0, overflow: 'hidden', transition: 'transform 0.15s' }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'none'}>
+      <div className="card hoverable fade-in-scale" style={{ padding: 0, overflow: 'hidden' }}>
         {/* Image */}
-        <div style={{ height: 180, background: '#f0f0f8', position: 'relative' }}>
+        <div style={{ height: 180, background: 'rgba(15, 23, 42, 0.5)', position: 'relative' }}>
           {img
             ? <img src={img} alt={product.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
             : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: 13 }}>No image</div>

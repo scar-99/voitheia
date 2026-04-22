@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProduct } from '../../api/products';
+import { getProduct, deleteProduct } from '../../api/products';
 import { createOrder } from '../../api/orders';
 import { useAuth } from '../../context/AuthContext';
+import CheckoutModal from '../../components/CheckoutModal';
 import toast from 'react-hot-toast';
 
 export default function ProductDetail() {
@@ -11,6 +12,7 @@ export default function ProductDetail() {
   const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     getProduct(id)
@@ -19,17 +21,23 @@ export default function ProductDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleBuy = async () => {
+  const handleBuyClick = () => {
     if (!user) {
       navigate('/login');
       return;
     }
+    setCheckoutOpen(true);
+  };
+
+  const handleConfirmOrder = async (deliveryAddress, paymentMethod) => {
     try {
-      const order = await createOrder({
+      await createOrder({
         type: 'product',
         productId: product._id,
         sellerId: product.seller._id,
-        price: product.price
+        price: product.price,
+        deliveryAddress,
+        paymentMethod
       });
       toast.success('Order placed! Check your dashboard');
       navigate('/dashboard');
@@ -38,8 +46,21 @@ export default function ProductDetail() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this listing?')) return;
+    try {
+      await deleteProduct(id);
+      toast.success('Listing deleted successfully');
+      navigate('/marketplace');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to delete listing');
+    }
+  };
+
   if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
   if (!product) return <div style={{ padding: '2rem', textAlign: 'center' }}>Product not found</div>;
+
+  const isOwner = user?.name === product.seller.name;
 
   return (
     <div style={{ maxWidth: '800px', margin: '2rem auto', padding: '1rem' }}>
@@ -59,17 +80,44 @@ export default function ProductDetail() {
           <h3>{product.seller.name}</h3>
           <p>Rating: {product.seller.rating} ⭐</p>
           <p>College: {product.seller.college}</p>
-          {product.status === 'available' && (
-            <button className="btn-primary" style={{ width: '100%' }} onClick={handleBuy}>
-              {user?.name === product.seller.name ? 'Your Listing' : 'Buy Now'}
-            </button>
+          {isOwner ? (
+            <>
+              <p style={{ color: 'var(--primary)', fontWeight: 600, marginBottom: '1rem' }}>Your Listing</p>
+              <button 
+                className="btn-danger" 
+                style={{ width: '100%', background: '#ff4444', color: '#fff', padding: '10px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                onClick={handleDelete}
+              >
+                Delete Listing
+              </button>
+            </>
+          ) : product.status === 'available' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <button className="btn-primary" style={{ width: '100%' }} onClick={handleBuyClick}>
+                Buy Now
+              </button>
+              {product.isNegotiable && (
+                <button className="btn-outline" style={{ width: '100%' }} onClick={() => {
+                  if (!user) return navigate('/login');
+                  navigate('/chat/' + [user._id, product.seller._id].sort().join('_'));
+                }}>
+                  Negotiate price
+                </button>
+              )}
+            </div>
           )}
           {product.status === 'sold' && (
-            <div style={{ padding: '10px', background: '#fee', color: '#933', borderRadius: '6px', textAlign: 'center', marginTop: '8px' }}
-            >Sold Out</div>
+            <div style={{ padding: '10px', background: '#fee', color: '#933', borderRadius: '6px', textAlign: 'center', marginTop: '8px' }}>Sold Out</div>
           )}
         </div>
       </div>
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setCheckoutOpen(false)} 
+        onConfirm={handleConfirmOrder} 
+        price={product.price} 
+        user={user} 
+      />
     </div>
   );
 }

@@ -4,9 +4,9 @@ import User from '../models/User.js';
 
 export const createOrder = async (req, res) => {
   try {
-    const { type, gigId, productId, sellerId, price, note } = req.body;
-    if (!type || !sellerId || !price)
-      return res.status(400).json({ message: 'type, sellerId, price required' });
+    const { type, gigId, productId, sellerId, price, note, deliveryAddress, paymentMethod } = req.body;
+    if (!type || !sellerId || !price || !paymentMethod)
+      return res.status(400).json({ message: 'type, sellerId, price, and paymentMethod required' });
 
     const order = await Order.create({
       type,
@@ -15,6 +15,8 @@ export const createOrder = async (req, res) => {
       buyer:   req.user._id,
       seller:  sellerId,
       price,
+      deliveryAddress,
+      paymentMethod,
       note,
     });
     res.status(201).json(order);
@@ -34,8 +36,8 @@ export const getMyOrders = async (req, res) => {
       .sort('-createdAt')
       .populate('gig', 'title price')
       .populate('product', 'title price images')
-      .populate('buyer', 'name avatar')
-      .populate('seller', 'name avatar');
+      .populate('buyer', 'name avatar email phone')
+      .populate('seller', 'name avatar email phone');
 
     res.json(orders);
   } catch (err) {
@@ -46,7 +48,9 @@ export const getMyOrders = async (req, res) => {
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id)
-      .populate('gig product buyer seller');
+      .populate('gig product')
+      .populate('buyer', 'name avatar email phone')
+      .populate('seller', 'name avatar email phone');
     if (!order) return res.status(404).json({ message: 'Order not found' });
     const isParty = [order.buyer._id, order.seller._id]
       .some(id => id.toString() === req.user._id.toString());

@@ -4,9 +4,14 @@ import cloudinary from '../config/cloudinary.js';
 
 export const createProduct = async (req, res) => {
   try {
-    const { title, description, price, category, condition, images } = req.body;
+    const { title, description, price, isNegotiable, category, condition, images } = req.body;
     if (!title || !price)
       return res.status(400).json({ message: 'Title and price are required' });
+
+    const user = await User.findById(req.user._id);
+    if (!user.upiId) {
+      return res.status(400).json({ message: 'A UPI ID is mandatory before listing a product. Please update your profile settings.' });
+    }
 
     let imageUrls = [];
     if (images && images.length > 0) {
@@ -20,11 +25,12 @@ export const createProduct = async (req, res) => {
 
     const product = await Product.create({
       seller: req.user._id, title, description,
-      price, category, condition, images: imageUrls,
+      price, isNegotiable, category, condition, images: imageUrls,
     });
 
     res.status(201).json(product);
   } catch (err) {
+    console.error('❌ Create Product Error:', err);
     res.status(500).json({ message: err.message });
   }
 };

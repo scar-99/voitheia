@@ -2,18 +2,23 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createGig } from '../../api/gigs';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 import { Upload } from 'lucide-react';
 
 const CATEGORIES = ['coding','design','writing','tutoring','editing','photography','other'];
 
 export default function AddGig() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ title:'', description:'', price:'', deliveryDays:'', category:'coding' });
+  const [form, setForm] = useState({ title:'', description:'', price:'', isNegotiable: false, deliveryDays:'', category:'coding' });
   const [images, setImages] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
 
-  const handle = e => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
+  const handle = e => {
+    const { name, value, type, checked } = e.target;
+    setForm(p => ({ ...p, [name]: type === 'checkbox' ? checked : value }));
+  };
 
   const handleImages = (e) => {
     Array.from(e.target.files).slice(0, 3).forEach(file => {
@@ -28,6 +33,10 @@ export default function AddGig() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (!user?.upiId) {
+      toast.error('A UPI ID is mandatory for freelancing. Please add it in your Dashboard Settings.');
+      return;
+    }
     setLoading(true);
     try {
       await createGig({ ...form, price: Number(form.price), deliveryDays: Number(form.deliveryDays), images });
@@ -59,6 +68,29 @@ export default function AddGig() {
             <div>
               <label style={{ fontSize: 13, fontWeight: 500, display: 'block', marginBottom: 6 }}>Price (₹) *</label>
               <input name="price" type="number" min="0" value={form.price} onChange={handle} required placeholder="299"/>
+              <div 
+                onClick={() => setForm(p => ({ ...p, isNegotiable: !p.isNegotiable }))}
+                style={{ 
+                  display: 'flex', alignItems: 'center', gap: 10, 
+                  padding: '10px 12px', marginTop: 8,
+                  background: form.isNegotiable ? 'rgba(0, 240, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                  border: `1px solid ${form.isNegotiable ? 'var(--primary)' : 'var(--border)'}`,
+                  borderRadius: '8px', cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}>
+                <div style={{
+                  width: 18, height: 18, borderRadius: 4, 
+                  border: `2px solid ${form.isNegotiable ? 'var(--primary)' : 'var(--muted)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  background: form.isNegotiable ? 'var(--primary)' : 'transparent',
+                  transition: 'all 0.2s ease'
+                }}>
+                  {form.isNegotiable && <span style={{ color: '#0f172a', fontSize: 12, fontWeight: 800 }}>✓</span>}
+                </div>
+                <span style={{ fontWeight: 500, fontSize: 13, color: form.isNegotiable ? '#fff' : 'var(--muted)' }}>
+                  Negotiable
+                </span>
+              </div>
             </div>
             <div>
               <label style={{ fontSize: 13, fontWeight: 500, display: 'block', marginBottom: 6 }}>Delivery (days) *</label>

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getGig } from '../../api/gigs';
 import { createOrder } from '../../api/orders';
 import { useAuth } from '../../context/AuthContext';
+import CheckoutModal from '../../components/CheckoutModal';
 import toast from 'react-hot-toast';
 
 export default function GigDetail() {
@@ -11,6 +12,7 @@ export default function GigDetail() {
   const { user } = useAuth();
   const [gig, setGig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCheckoutOpen, setCheckoutOpen] = useState(false);
 
   useEffect(() => {
     getGig(id)
@@ -19,17 +21,23 @@ export default function GigDetail() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleOrder = async () => {
+  const handleOrderClick = () => {
     if (!user) {
       navigate('/login');
       return;
     }
+    setCheckoutOpen(true);
+  };
+
+  const handleConfirmOrder = async (deliveryAddress, paymentMethod) => {
     try {
       await createOrder({
         type: 'gig',
         gigId: gig._id,
         sellerId: gig.freelancer._id,
-        price: gig.price
+        price: gig.price,
+        deliveryAddress,
+        paymentMethod
       });
       toast.success('Order placed! Check your dashboard');
       navigate('/dashboard');
@@ -60,9 +68,19 @@ export default function GigDetail() {
           <p>Rating: {gig.freelancer.rating} ⭐</p>
           <p>College: {gig.freelancer.college}</p>
           {gig.isActive && (
-            <button className="btn-primary" style={{ width: '100%', marginTop: '8px' }} onClick={handleOrder}>
-              Place Order
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <button className="btn-primary" style={{ width: '100%' }} onClick={handleOrderClick}>
+                Place Order
+              </button>
+              {gig.isNegotiable && (
+                <button className="btn-outline" style={{ width: '100%' }} onClick={() => {
+                  if (!user) return navigate('/login');
+                  navigate('/chat/' + [user._id, gig.freelancer._id].sort().join('_'));
+                }}>
+                  Negotiate price
+                </button>
+              )}
+            </div>
           )}
           {!gig.isActive && (
             <div style={{ padding: '10px', background: '#fee', color: '#933', borderRadius: '6px', textAlign: 'center', marginTop: '8px' }}
@@ -70,6 +88,13 @@ export default function GigDetail() {
           )}
         </div>
       </div>
+      <CheckoutModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setCheckoutOpen(false)} 
+        onConfirm={handleConfirmOrder} 
+        price={gig.price} 
+        user={user} 
+      />
     </div>
   );
 }

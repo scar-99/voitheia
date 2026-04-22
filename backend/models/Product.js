@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
   title:       { type: String, required: true, trim: true },
   description: { type: String, default: '' },
   price:       { type: Number, required: true, min: 0 },
+  isNegotiable:{ type: Boolean, default: false },
   category:    {
     type: String,
     enum: ['books', 'electronics', 'clothing', 'hostel', 'sports', 'other'],

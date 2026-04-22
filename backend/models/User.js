@@ -8,6 +8,13 @@ const userSchema = new mongoose.Schema({
   avatar:      { type: String, default: '' },
   college:     { type: String, default: '' },
   bio:         { type: String, default: '' },
+  phone:       { type: String, default: '' },
+  upiId:       { type: String, default: '' },
+  addresses: [{
+    label: { type: String, enum: ['Home', 'Work', 'Other'], default: 'Home' },
+    text: { type: String, required: true },
+    isDefault: { type: Boolean, default: false }
+  }],
   rating:      { type: Number, default: 0 },
   reviewCount: { type: Number, default: 0 },
   wishlist:    [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],

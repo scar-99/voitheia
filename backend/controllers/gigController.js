@@ -1,11 +1,17 @@
 import Gig from '../models/Gig.js';
+import User from '../models/User.js';
 import cloudinary from '../config/cloudinary.js';
 
 export const createGig = async (req, res) => {
   try {
-    const { title, description, price, deliveryDays, category, images } = req.body;
+    const { title, description, price, isNegotiable, deliveryDays, category, images } = req.body;
     if (!title || !price || !deliveryDays)
       return res.status(400).json({ message: 'Title, price, deliveryDays are required' });
+
+    const user = await User.findById(req.user._id);
+    if (!user.upiId) {
+      return res.status(400).json({ message: 'A UPI ID is mandatory before listing a gig. Please update your profile settings.' });
+    }
 
     let imageUrls = [];
     if (images && images.length > 0) {
@@ -17,7 +23,7 @@ export const createGig = async (req, res) => {
 
     const gig = await Gig.create({
       freelancer: req.user._id, title, description,
-      price, deliveryDays, category, images: imageUrls,
+      price, isNegotiable, deliveryDays, category, images: imageUrls,
     });
 
     res.status(201).json(gig);

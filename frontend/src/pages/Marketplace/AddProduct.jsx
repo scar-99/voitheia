@@ -9,6 +9,7 @@ export default function AddProduct() {
     title: '',
     description: '',
     price: '',
+    isNegotiable: false,
     category: 'other',
     condition: 'good',
     images: []
@@ -17,8 +18,8 @@ export default function AddProduct() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleImageUpload = (e) => {
@@ -40,6 +41,10 @@ export default function AddProduct() {
     }
     if (!form.title || !form.price) {
       toast.error('Title and price are required');
+      return;
+    }
+    if (!user.upiId) {
+      toast.error('A UPI ID is mandatory for selling. Please add it in your Dashboard Settings.');
       return;
     }
     try {
@@ -80,6 +85,29 @@ export default function AddProduct() {
           required
           style={{ width: '100%', padding: '8px', marginBottom: '12px' }}
         />
+        <div 
+          onClick={() => setForm(p => ({ ...p, isNegotiable: !p.isNegotiable }))}
+          style={{ 
+            display: 'flex', alignItems: 'center', gap: 12, 
+            padding: '12px 16px', 
+            background: form.isNegotiable ? 'rgba(0, 240, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+            border: `1px solid ${form.isNegotiable ? 'var(--primary)' : 'var(--border)'}`,
+            borderRadius: '8px', cursor: 'pointer', marginBottom: '16px',
+            transition: 'all 0.2s ease'
+          }}>
+          <div style={{
+            width: 20, height: 20, borderRadius: 6, 
+            border: `2px solid ${form.isNegotiable ? 'var(--primary)' : 'var(--muted)'}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: form.isNegotiable ? 'var(--primary)' : 'transparent',
+            transition: 'all 0.2s ease'
+          }}>
+            {form.isNegotiable && <span style={{ color: '#0f172a', fontSize: 14, fontWeight: 800 }}>✓</span>}
+          </div>
+          <span style={{ fontWeight: 500, fontSize: 14, color: form.isNegotiable ? '#fff' : 'var(--muted)' }}>
+            Price is negotiable
+          </span>
+        </div>
         <select
           name="category"
           value={form.category}
