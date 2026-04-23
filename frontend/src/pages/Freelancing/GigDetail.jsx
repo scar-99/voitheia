@@ -95,6 +95,37 @@ export default function GigDetail() {
         price={gig.price} 
         user={user} 
       />
+
+      {/* Portfolio Section */}
+      {gig.portfolio && gig.portfolio.length > 0 && (
+        <div style={{ marginTop: '2.5rem' }}>
+          <h2 style={{ fontWeight: 700, fontSize: 20, marginBottom: '1.25rem' }}>
+            🗂️ Portfolio &amp; Previous Works
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '1.25rem' }}>
+            {gig.portfolio.map((item, i) => (
+              <div key={i} className="card hoverable" style={{ padding: 0, overflow: 'hidden' }}>
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.title}
+                    style={{ width: '100%', height: 160, objectFit: 'cover' }}/>
+                ) : (
+                  <div style={{ width: '100%', height: 160, background: 'rgba(0,240,255,0.05)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 36 }}>🖼️</div>
+                )}
+                <div style={{ padding: '0.85rem' }}>
+                  {item.title && (
+                    <p style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.title}</p>
+                  )}
+                  {item.description && (
+                    <p style={{ fontSize: 13, color: 'var(--muted)', lineHeight: 1.5 }}>{item.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

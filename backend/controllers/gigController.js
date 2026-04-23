@@ -4,7 +4,7 @@ import cloudinary from '../config/cloudinary.js';
 
 export const createGig = async (req, res) => {
   try {
-    const { title, description, price, isNegotiable, deliveryDays, category, images } = req.body;
+    const { title, description, price, isNegotiable, deliveryDays, category, images, portfolio } = req.body;
     if (!title || !price || !deliveryDays)
       return res.status(400).json({ message: 'Title, price, deliveryDays are required' });
 
@@ -13,6 +13,7 @@ export const createGig = async (req, res) => {
       return res.status(400).json({ message: 'A UPI ID is mandatory before listing a gig. Please update your profile settings.' });
     }
 
+    // Upload cover images
     let imageUrls = [];
     if (images && images.length > 0) {
       const uploads = await Promise.all(
@@ -21,9 +22,25 @@ export const createGig = async (req, res) => {
       imageUrls = uploads.map(r => r.secure_url);
     }
 
+    // Upload portfolio item images
+    let portfolioItems = [];
+    if (portfolio && portfolio.length > 0) {
+      portfolioItems = await Promise.all(
+        portfolio.map(async (item) => {
+          let imageUrl = '';
+          if (item.imageUrl && item.imageUrl.startsWith('data:')) {
+            const result = await cloudinary.uploader.upload(item.imageUrl, { folder: 'voitheia/portfolio' });
+            imageUrl = result.secure_url;
+          }
+          return { title: item.title || '', description: item.description || '', imageUrl };
+        })
+      );
+    }
+
     const gig = await Gig.create({
       freelancer: req.user._id, title, description,
-      price, isNegotiable, deliveryDays, category, images: imageUrls,
+      price, isNegotiable, deliveryDays, category,
+      images: imageUrls, portfolio: portfolioItems,
     });
 
     res.status(201).json(gig);

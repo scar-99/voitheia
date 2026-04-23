@@ -12,8 +12,13 @@ const gigSchema = new mongoose.Schema({
     enum: ['coding', 'design', 'writing', 'tutoring', 'editing', 'photography', 'other'],
     default: 'other'
   },
-  images:       [{ type: String }],
-  isActive:     { type: Boolean, default: true },
+  images:    [{ type: String }],
+  isActive:  { type: Boolean, default: true },
+  portfolio: [{
+    title:       { type: String, default: '' },
+    description: { type: String, default: '' },
+    imageUrl:    { type: String, default: '' },
+  }],
 }, { timestamps: true });
 
 export default mongoose.model('Gig', gigSchema);
