@@ -14,6 +14,7 @@ import ProductDetail from './pages/Marketplace/ProductDetail';
 import AddProduct    from './pages/Marketplace/AddProduct';
 import Freelancing   from './pages/Freelancing/Freelancing';
 import AddGig        from './pages/Freelancing/AddGig';
+import GigDetail     from './pages/Freelancing/GigDetail';
 import ChatPage      from './pages/Chat/ChatPage';
 import ChatInbox     from './pages/Chat/ChatInbox';
 import Dashboard     from './pages/Dashboard/Dashboard';
@@ -52,6 +53,7 @@ export default function App() {
                 <Route path="/sell"        element={<AddProduct/>}/>
                 <Route path="/gigs"        element={<Freelancing/>}/>
                 <Route path="/gigs/add"    element={<AddGig/>}/>
+                <Route path="/gigs/:id"    element={<GigDetail/>}/>
                 <Route path="/chat"        element={<ChatInbox/>}/>
                 <Route path="/chat/:chatId" element={<ChatPage/>}/>
                 <Route path="/dashboard"   element={<Dashboard/>}/>
